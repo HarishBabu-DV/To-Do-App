@@ -1,13 +1,6 @@
 import { Button } from "./components/ui/button"
 import { Input } from "./components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
+import { Table,TableBody,TableCaption,TableCell,TableFooter,TableHead,TableHeader,
   TableRow,
 } from "./components/ui/table"
 import {
@@ -22,9 +15,13 @@ import {
 } from "./components/ui/dialog"
 import { Label } from "./components/ui/label"
 import { useEffect, useState } from "react"
-import { getAllTodos } from "./services/AllAPI"
+import { addTodo, getAllTodos } from "./services/AllAPI"
+import { Skeleton } from "./components/ui/skeleton"
+import { toast } from "sonner"
 const App = () => {
-  const [task,setTask]=useState("")
+  const [task,setTask]=useState({
+      task: ""
+  })
   const [todos,setToDos]=useState([])
   const handleDelete=()=>{
     alert("Deleted");
@@ -32,6 +29,23 @@ const App = () => {
   const fetchTodos=async ()=>{
     const res=await getAllTodos()
     setToDos(res.data)
+  }
+  const handleSubmit=async () => {
+    
+    try {
+      const res=await addTodo(task)
+      if(res.status===201){
+        toast.success("Task added successfully");
+      }else{
+        toast.error("Something went wrong")
+      }
+    } catch (error) {
+      toast.error(`Internal Error ${error}`)
+    }
+    fetchTodos()
+    setTask({
+
+    })
   }
   useEffect(()=>{
     fetchTodos()
@@ -42,9 +56,9 @@ const App = () => {
         <h1 className="text-3xl font-semibold text-left">TODO App</h1>
         <div className="flex items-center gap-5">
           <Input type="email" placeHolder="Enter your Email" onChange={(e)=>{
-            setTask(e.target.value)
+            setTask({task:e.target.value})
           }}/>
-          <Button >ADD</Button>
+          <Button onClick={handleSubmit}>ADD</Button>
         </div>
         <hr />
         <div>
@@ -58,7 +72,7 @@ const App = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {todos.map((todo,index) => (
+            { todos ? todos.map((todo,index) => (
               <TableRow key={index}>
                 <TableCell className="font-medium">{todo.id}</TableCell>
                 <TableCell>{todo.task}</TableCell>
@@ -104,11 +118,13 @@ const App = () => {
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
-                    <Button className="bg-red-500">Delete</Button>
+                    <Button className="bg-red-500" onClick={handleDelete}>Delete</Button>
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+            )) :(
+             <p className="text-xl">Loading <span className="animate-ping">...</span></p>
+            )}
           </TableBody>
           <TableFooter>
             <TableRow>
