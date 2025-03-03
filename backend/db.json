@@ -1,32 +1,20 @@
 {
   "tasks": [
     {
-      "id": 1,
-      "task": "Task 1"
+      "task": "new",
+      "id": 1
     },
     {
-      "task": "harish",
+      "task": "Task 2",
       "id": 2
     },
     {
-      "task": "new",
+      "task": "Task 3",
       "id": 3
     },
     {
-      "task": "helllo",
+      "task": "task4",
       "id": 4
-    },
-    {
-      "task": "new",
-      "id": 5
-    },
-    {
-      "task": "helllo harish",
-      "id": 6
-    },
-    {
-      "task": "new world",
-      "id": 7
     }
   ]
 }
