@@ -15,7 +15,7 @@ import {
 } from "./components/ui/dialog"
 import { Label } from "./components/ui/label"
 import { useEffect, useState } from "react"
-import { addTodo, getAllTodos } from "./services/AllAPI"
+import { addTodo, deleteTask, getAllTodos, updateTaskApi } from "./services/AllAPI"
 import { Skeleton } from "./components/ui/skeleton"
 import { toast } from "sonner"
 const App = () => {
@@ -23,15 +23,30 @@ const App = () => {
       task: ""
   })
   const [todos,setToDos]=useState([])
-  const handleDelete=()=>{
-    alert("Deleted");
+  const [updateTask,setUpdateTask]= useState({
+    task:""
+  })
+  const handleUpdate=async (id)=>{
+    const res= await updateTaskApi(id,updateTask);
+    fetchTodos();
+    console.log(res);
+  }
+  const handleDelete=async (id)=>{
+    try {
+      const res=await deleteTask(id)
+      if(res.status===200){
+        toast.error("Task deleted successfully")
+      }
+      fetchTodos();
+    } catch (error) {
+        toast.error("400 error occured")
+    }
   }
   const fetchTodos=async ()=>{
     const res=await getAllTodos()
     setToDos(res.data)
   }
   const handleSubmit=async () => {
-    
     try {
       const res=await addTodo(task)
       if(res.status===201){
@@ -39,13 +54,11 @@ const App = () => {
       }else{
         toast.error("Something went wrong")
       }
+      fetchTodos()
     } catch (error) {
       toast.error(`Internal Error ${error}`)
     }
-    fetchTodos()
-    setTask({
-
-    })
+   
   }
   useEffect(()=>{
     fetchTodos()
@@ -90,35 +103,27 @@ const App = () => {
                           </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="name" className="text-right">
-                              Name
-                            </Label>
-                            <Input
-                              id="name"
-                              defaultValue="Pedro Duarte"
-                              className="col-span-3"
-                            />
-                          </div>
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="username" className="text-right">
-                              Username
-                            </Label>
+                          
                             <Input
                               id="username"
-                              defaultValue="@peduarte"
+                              value={updateTask.value}
+                              onChange={(e)=>{
+                                setUpdateTask({
+                                  task:e.target.value
+                                })
+                              }}
                               className="col-span-3"
                             />
-                          </div>
+                         
                         </div>
                         <DialogFooter>
                           <DialogClose>
-                            <Button type="submit">Save changes</Button>
+                            <Button type="submit" onClick={()=>handleUpdate(todo.id)}>Save changes</Button>
                           </DialogClose>
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
-                    <Button className="bg-red-500" onClick={handleDelete}>Delete</Button>
+                    <Button className="bg-red-500" onClick={()=>handleDelete(todo.id)}>Delete</Button>
                   </div>
                 </TableCell>
               </TableRow>
